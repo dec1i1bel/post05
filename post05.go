@@ -59,7 +59,7 @@ func exists(username string) int {
 	return userID
 }
 
-func addUser(d Userdata) int {
+func AddUser(d Userdata) int {
 	d.Username = strings.ToLower(d.Username)
 	db, err := openConnection()
 	if err != nil {
@@ -92,7 +92,7 @@ func addUser(d Userdata) int {
 	return userID
 }
 
-func deleteUser(id int) error {
+func DeleteUser(id int) error {
 	db, err := openConnection()
 	if err != nil {
 		return err
@@ -148,9 +148,9 @@ func ListUsers() ([]Userdata, error) {
 		if err != nil {
 			return Data, err
 		}
-		defer rows.Close()
-		return Data, nil
 	}
+	defer rows.Close()
+	return Data, nil
 }
 
 func UpdateUser(d Userdata) error {
