@@ -1,14 +1,18 @@
 package main
 
+// Утилита проверяет возможность подключиться к базе данных PostgreSQL и получить список доступных баз данных и таблиц в этой базе данных и public схеме — вся информация о подключении предоставляется в качестве аргументов командной строки
+
 import (
 	"database/sql"
 	"fmt"
 	"os"
 	"strconv"
 
-	// Пакет lib/pq, который является интерфейсом к базе данных PostgreSQL, не используется непосредственно кодом. Следовательно, вам необходимо импортировать пакет lib/pq с помощью _, чтобы компилятор Go не выдавал сообщение об ошибке, связанное с импортом пакета, а не с его применением. Обычно это не нужно, но этот вид импорта обычно вызван тем, что импортированный пакет имеет побочные эффекты, такие как регистрация себя в качестве обработчика базы данных для пакета sql
+	// Пакет - интерфейс к базе данных PostgreSQL, не используется непосредственно кодом. импорт - с помощью _, чтобы компилятор не выдавал ошибку неиспользуемого пакета.
 	_ "github.com/lib/pq"
 )
+
+var db *sql.DB
 
 func findTables() {
 	query := `SELECT table_name FROM information_schema.tables WHERE atble_schema='public' ORDER BY table_name`
@@ -44,7 +48,7 @@ func main() {
 	pass := arguments[4]
 	database := arguments[5]
 
-	conn := fmt.SPrintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, pass, database)
+	conn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, pass, database)
 	db, err := sql.Open("postgres", conn)
 	if err != nil {
 		fmt.Println("Open():", err)
@@ -62,7 +66,7 @@ func main() {
 		var name string
 		err = rows.Scan(&name)
 		if err != nil {
-			fmt.Println("Scan"), err
+			fmt.Println("Scan", err)
 			return
 		}
 		fmt.Println("*", name)
