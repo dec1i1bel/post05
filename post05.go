@@ -1,6 +1,4 @@
-package main
-
-// package post05
+package post05
 
 import (
 	"database/sql"
@@ -41,7 +39,7 @@ func openDbCon() (*sql.DB, error) {
 	return db, nil
 }
 
-func findUserId(username string) int {
+func FindUserId(username string) int {
 	username = strings.ToLower(username)
 	db, err := openDbCon()
 	if err != nil {
@@ -88,7 +86,7 @@ func AddUser(udata UserData) int {
 		return -1
 	}
 
-	newUserId := findUserId(udata.Username)
+	newUserId := FindUserId(udata.Username)
 	if newUserId <= 0 {
 		fmt.Println("AdUser: user was not added to table users")
 		return -1
@@ -159,7 +157,7 @@ func ListUsers() ([]UserData, error) {
 	return Data, nil
 }
 
-func checkIfEmptyDb() (bool, error) {
+func CheckIfEmptyDb() (bool, error) {
 	db, err := openDbCon()
 	if err != nil {
 		return true, err
@@ -174,7 +172,7 @@ func checkIfEmptyDb() (bool, error) {
 	}
 
 	if countRows == 0 {
-		fmt.Println("checkIfEmptyDb: users - empty")
+		fmt.Println("CheckIfEmptyDb: users - empty")
 		return true, nil
 	}
 
@@ -185,7 +183,7 @@ func checkIfEmptyDb() (bool, error) {
 	}
 
 	if countRows == 0 {
-		fmt.Println("checkIfEmptyDb: userdata - empty")
+		fmt.Println("CheckIfEmptyDb: userdata - empty")
 		return true, nil
 	}
 
@@ -213,10 +211,11 @@ func random(min, max int) int {
 }
 
 // Генерирование случайной строки
-func getString(length int64) string {
+func GetString(length int64) string {
 	startChar := "A"
-	temp := ""
 	var i int64 = 1
+	temp := ""
+
 	for {
 		myRand := random(MIN, MAX)
 		newChar := string(startChar[0] + byte(myRand))
@@ -228,81 +227,4 @@ func getString(length int64) string {
 		i++
 	}
 	return temp
-}
-
-func main() {
-	Hostname = "localhost"
-	Port = 5432
-	Username = "postgres"
-	Password = "mysecretpassword"
-	Database = "postgres"
-	isEmptyDb, err := checkIfEmptyDb()
-
-	if err != nil {
-		fmt.Println("func main: error check if empty db:", err)
-		return
-	}
-
-	if isEmptyDb {
-		fmt.Println("func main: db is empty, no ListUsers will be called")
-	}
-
-	if !isEmptyDb {
-		data, err := ListUsers()
-
-		if err != nil {
-			fmt.Println("error using ListUsers:", err)
-		}
-
-		for _, v := range data {
-			fmt.Println("func main - row:", v)
-		}
-	}
-
-	newUserName := getString(5)
-
-	fmt.Println("newUserName:", newUserName)
-
-	curUserId := 0
-	if !isEmptyDb {
-		curUserId = findUserId(newUserName)
-	}
-
-	udata := UserData{
-		Username:    newUserName,
-		Name:        "Test Name post05",
-		Surname:     "Test Surname post05",
-		Description: "Test Description post05",
-	}
-
-	newUserId := 0
-	if curUserId <= 0 {
-		newUserId = AddUser(udata)
-	}
-
-	if newUserId > 0 {
-		udata = UserData{
-			ID:          newUserId,
-			Username:    newUserName,
-			Name:        "Test",
-			Surname:     "User 1",
-			Description: "this night not be me",
-		}
-
-		err = UpdateUser(udata)
-		if err != nil {
-			fmt.Println("error using UpdateUser:", err)
-		} else {
-			fmt.Printf("user <%s> with id <%d> updated successfully\n", newUserName, newUserId)
-		}
-
-		err = DeleteUser(newUserId)
-		if err != nil {
-			fmt.Println("error using DeleteUser", err)
-		} else {
-			fmt.Printf("user <%s> with id <%d> deleted successfully\n", newUserName, newUserId)
-		}
-	} else {
-		fmt.Println("Error adding user", udata.Username)
-	}
 }
